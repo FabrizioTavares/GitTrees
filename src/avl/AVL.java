@@ -52,15 +52,11 @@ public class AVL extends binary.BinaryTree{
                     System.out.println("Stopping.");
                     break;
                 
-                /*
-                case "info": // informação do nó selecionado
-                    System.out.println("Balance: " + this.targetedNode.balance);
-                    System.out.println("Grau: " + this.targetedNode.grau() + ", Endpoint?: " +this.targetedNode.StringEndpoint());
-                    System.out.println("Profundidade: " + this.targetedNode.doLevel(root));
-                    System.out.println("Nível: " + this.targetedNode.doLevel(root));
-                    System.out.println("Altura: " + (this.targetedNode.doHeight()));
+                case 4: 
+                    System.out.print(">>> Value of node to be fetched: ");
+                    this.userinputint = readinput.nextInt();
+                    this.info(this.fetch(userinputint));
                     break;
-                */
                     
                 case 2: //remover certo valor
                     System.out.print(">>> Value to be removed: ");
@@ -117,6 +113,25 @@ public class AVL extends binary.BinaryTree{
             this.root = newNode;
             System.out.println("Root REPLACED. Pointing to root.");
         }
+    }
+    
+    @Override
+    public NodeBal fetch(int target){
+        NodeBal current = root;
+        while (current != null) {
+            if (current.getValue() == target) {
+                break;
+            }
+            current = current.getValue() < target ? current.getRight() : current.getLeft();
+        }
+        return current;
+    }
+    
+    public void info(NodeBal target){
+        System.out.println("Grau: " + target.grau() + ", Endpoint?: " + target.StringEndpoint());
+        System.out.println("Profundidade: " + target.doLevel(root));
+        System.out.println("Nível: " + target.doLevel(root));
+        System.out.println("Altura: " + (target.doHeight()));
     }
     
     public int calculateNodes(NodeBal root) { //calcular número de nós

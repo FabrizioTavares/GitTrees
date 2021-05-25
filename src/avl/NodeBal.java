@@ -57,6 +57,44 @@ public class NodeBal extends binary.Node{
         this.right = right;
     }
     
+    public int doLevel(NodeBal current) { // buscar nível
+        
+        int count = 0;
+        
+        if (this.value == current.value) { // este nó foi achado. retornar valor.
+            return count++;
+        }
+        
+        if (this.value < current.getValue()) { // navegar até à esquerda, em busca do nó
+            count = 1 + doLevel(current.getLeft());
+        }
+
+        else if (this.value > current.getValue()) { // navegar até à direita, em busca do nó
+            count = 1 + doLevel(current.getRight());
+        }
+
+        return count;
+        
+    }
+    
+    @Override
+    public int doHeight() // calcular altura
+    {
+        if((left == null) && (right == null)) // não há filhos = 0.
+            return 0;
+
+        int auxLeft = 0, auxRight = 0; // contadores
+        
+        if(left != null)
+            auxLeft = left.doHeight(); 
+
+        if(right != null)
+            auxRight = right.doHeight();
+        
+        return 1 + Math.max(auxLeft, auxRight);
+        // máximo da contagem tanto da esquerda quanto da direita, achando assim o caminho mais distante.
+        
+    }
     
     @Override
     public String getText() {

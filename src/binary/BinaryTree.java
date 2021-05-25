@@ -49,17 +49,13 @@ public class BinaryTree<T> {
                 case -1: // quit.
                     System.out.println("Stopping.");
                     break;
-                
-                /*    
-                case "info": // informação do nó selecionado
-                    System.out.println("Grau: " + this.targetedNode.grau() + ", Endpoint?: " +this.targetedNode.StringEndpoint());
-                    System.out.println("Profundidade: " + this.targetedNode.doLevel(root));
-                    System.out.println("Nível: " + this.targetedNode.doLevel(root));
-                    System.out.println("Altura: " + (this.targetedNode.doHeight()));
+                  
+                case 4: 
+                    System.out.print(">>> Value of node to be fetched: ");
+                    this.userinputint = readinput.nextInt();
+                    this.info(this.fetch(userinputint));
                     break;
-                */
-                    
-                     
+                
                 case 2: //remover certo valor
                     System.out.print(">>> Value to be removed: ");
                     this.userinputint = readinput.nextInt();
@@ -93,6 +89,24 @@ public class BinaryTree<T> {
         } catch (Exception e) {
             System.out.println("[Alert] Could not print diagram!");
         }
+    }
+    
+    public Node fetch(int target){
+        Node current = root;
+        while (current != null) {
+            if (current.getValue() == target) {
+                break;
+            }
+            current = current.getValue() < target ? current.getRight() : current.getLeft();
+        }
+        return current;
+    }
+    
+    public void info(Node target){
+        System.out.println("Grau: " + target.grau() + ", Endpoint?: " + target.StringEndpoint());
+        System.out.println("Profundidade: " + target.doLevel(root));
+        System.out.println("Nível: " + target.doLevel(root));
+        System.out.println("Altura: " + (target.doHeight()));
     }
 
     public Node getRoot() {

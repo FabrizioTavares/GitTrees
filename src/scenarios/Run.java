@@ -13,7 +13,7 @@ public class Run {
         
         Scanner scan = new Scanner(System.in);
         int choice;
-        System.out.println("Insert tree type: ");
+        System.out.println("Insert tree type: (1) BST, (2) AVL. ");
         choice = scan.nextInt();
         
         switch(choice){
