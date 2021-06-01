@@ -21,13 +21,6 @@ public class NodeBal extends binary.Node{
         this.left = null;
         this.right = null;
     }
-    
-    public NodeBal(String name, int value){
-        this.value = value;
-        this.balance = 0;
-        this.left = null;
-        this.right = null;
-    }
 
     @Override
     public int getValue() {
@@ -80,7 +73,10 @@ public class NodeBal extends binary.Node{
     @Override
     public int doHeight() // calcular altura
     {
-        if((left == null) && (right == null)) // não há filhos = 0.
+        if(this == null)
+            return 0;
+        
+        if(((left == null) && (right == null))) // não há filhos = 0.
             return 0;
 
         int auxLeft = 0, auxRight = 0; // contadores

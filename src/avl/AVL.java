@@ -9,7 +9,7 @@ import utils.TreePrinter;
 
 public class AVL extends binary.BinaryTree{
     
-    private NodeBal root;
+    public NodeBal root;
 
     
     public AVL(){
@@ -27,6 +27,12 @@ public class AVL extends binary.BinaryTree{
         while (this.userinput != -1) {
             
             this.update(); // every loop, print diagram of the tree
+            System.out.print("Root: ");
+            try {
+                System.out.println(this.root.getValue());
+            } catch (Exception e) {
+                System.out.println("?");
+            }
             
             System.out.print("Option: ");
             this.userinput = readinput.nextInt(); // input. Await user.
@@ -38,7 +44,10 @@ public class AVL extends binary.BinaryTree{
                             + "\n'0': create a new empty root"
                             + "\n'-1': quits the program"
                             + "\n'1': recursively inserts new node with value"
+                            + "\n'2': remove a node"
                             + "\n'3': print information about the tree"
+                            + "\n'4': print information about a node"
+                            + "\n'9': print this help section"
                             );
                     break;
                     
@@ -51,11 +60,11 @@ public class AVL extends binary.BinaryTree{
                 case -1: // quit.
                     System.out.println("Stopping.");
                     break;
-                
-                case 4: 
-                    System.out.print(">>> Value of node to be fetched: ");
+                  
+                case 1: // insere objeto no conteúdo do nó.
+                    System.out.print(">>> New Value: ");
                     this.userinputint = readinput.nextInt();
-                    this.info(this.fetch(userinputint));
+                    this.insertElement(root, userinputint);
                     break;
                     
                 case 2: //remover certo valor
@@ -63,14 +72,9 @@ public class AVL extends binary.BinaryTree{
                     this.userinputint = readinput.nextInt();
                     this.delete(root, userinputint);
                     break;
-                    
-                case 1: // insere objeto no conteúdo do nó.
-                    System.out.print(">>> New Value: ");
-                    this.userinputint = readinput.nextInt();
-                    this.insertElement(root, userinputint);
-                    break;
                              
                 case 3: // imprimir informações da árvore
+                    updateAllBalances(root);
                     this.calculateNodes(root);
                     System.out.println("Pre Order NLR:");
                     this.traversePreOrder(root);
@@ -78,8 +82,14 @@ public class AVL extends binary.BinaryTree{
                     this.traversePostOrder(root);
                     System.out.println("\nIn Order LNR:");
                     this.traverseInOrder(root);
+                    System.out.println("\n[!] Finished printing tree information\n");
                     break;
                     
+                case 4: 
+                    System.out.print(">>> Value of node to be fetched: ");
+                    this.userinputint = readinput.nextInt();
+                    this.info(this.fetch(root, userinputint));
+                    break;
           
             }
             
@@ -95,43 +105,141 @@ public class AVL extends binary.BinaryTree{
             System.out.println("[Alert] Could not print diagram!");
         }
     }
+    
+    public void updateAllBalances(NodeBal node) { // NLR
+        if (node != null) {
+            updateBalance(node);
+            updateAllBalances(node.getLeft());
+            updateAllBalances(node.getRight());
+        }
+    }
+    
+    public void updateOnCourse(NodeBal current, int target){
+        
+        if (current != null) {
+            updateBalance(current);
+            if (current.getValue() > target) { //left
+                updateOnCourse(current.getLeft(), target);
+            } else if (current.getValue() < target) { //right
+                updateOnCourse(current.getRight(), target);
+            }
+        }
+        
+    }
 
     @Override
     public NodeBal getRoot() {
         return root;
     }
-    
+
+    public void setRoot(NodeBal root) {
+        this.root = root;
+    }
+
     @Override
     public void createRoot(int value){ //criar raiz
         NodeBal newNode = new NodeBal();
         newNode.setValue(value);
         if (this.root == null) {
             this.root = newNode;
-            System.out.println("Root Created. Pointing to root.");
+            System.out.println("Root Created.");
         }
         else {
             this.root = newNode;
-            System.out.println("Root REPLACED. Pointing to root.");
+            System.out.println("Root REPLACED.");
         }
     }
     
-    @Override
-    public NodeBal fetch(int target){
-        NodeBal current = root;
-        while (current != null) {
+    public NodeBal fetch(NodeBal current, int target){
+        
+        if (current != null) {
             if (current.getValue() == target) {
-                break;
+                return current;
+            } else if (current.getValue() > target) { //left
+                return fetch(current.getLeft(), target);
+            } else if (current.getValue() < target) { //right
+                return fetch(current.getRight(), target);
+            } else {
+                return null;
             }
-            current = current.getValue() < target ? current.getRight() : current.getLeft();
         }
         return current;
+        
     }
     
+    public NodeBal fetchPivotOf(int target){
+        NodeBal current = root;
+        NodeBal pivot = null;
+        while (current != null) {
+
+            if (current.balance != 0) {
+                pivot = current;
+            }
+            
+            if (current.getValue() > target){ //left
+                current = current.getLeft();
+            }
+            
+            else if (current.getValue() < target){ // right
+                current = current.getRight();
+            }
+            
+            else { // value reached
+                break;
+            }
+
+        }
+        return pivot;
+    }
+    
+    public NodeBal fetchParentOf(int target){
+        NodeBal current = root;
+        NodeBal parent = null;
+        while (current != null) {
+            
+            if (current.getLeft() != null){
+                if (current.getLeft().getValue() == target){
+                    parent = current;
+                }
+            }
+            
+            if (current.getRight() != null){
+                if (current.getRight().getValue() == target){
+                    parent = current;
+                }
+            }
+            
+            if (current.getValue() > target){ //left
+                current = current.getLeft();
+            }
+            
+            else if (current.getValue() < target){ // right
+                current = current.getRight();
+            }
+            
+            else {
+                break;
+            }
+
+        }
+        return parent;
+    }
+   
     public void info(NodeBal target){
-        System.out.println("Grau: " + target.grau() + ", Endpoint?: " + target.StringEndpoint());
-        System.out.println("Profundidade: " + target.doLevel(root));
-        System.out.println("Nível: " + target.doLevel(root));
-        System.out.println("Altura: " + (target.doHeight()));
+        if (target != null) {
+            System.out.println("Object: " + target);
+            System.out.println("Value: " + target.getValue());
+            System.out.println("Balance: " + getBalance(target));
+            System.out.println("Parent: " + fetchParentOf(target.getValue()));
+            System.out.println("Nearest Unbalance: " + fetchPivotOf(target.getValue()));
+            System.out.println("Grau: " + target.grau() + ", Endpoint?: " + target.StringEndpoint());
+            System.out.println("Profundidade: " + target.doLevel(root));
+            System.out.println("Nível: " + target.doLevel(root));
+            System.out.println("Altura: " + (target.doHeight()));
+        } else {
+            System.out.println("[info()]: Node does not exists.");
+        }
+        
     }
     
     public int calculateNodes(NodeBal root) { //calcular número de nós
@@ -152,9 +260,9 @@ public class AVL extends binary.BinaryTree{
     }
     
     
-    // ####################
-    // METODOS DE NAVEGAÇÃO
-    // ####################
+    // ------------------
+    // Navigation Methods
+    // ------------------
     
     public void traversePreOrder(NodeBal node) { // NLR
         if (node != null) {
@@ -213,21 +321,36 @@ public class AVL extends binary.BinaryTree{
     // AVL TREE METHODS
     // ##################################
     
-    void updateHeight(NodeBal node) {
-        node.balance = 1 + Math.max(height(node.getLeft()), height(node.getRight()));
+    void updateBalance(NodeBal node) {
+        node.balance = getBalance(node);
+        //node.balance = 1 + Math.max(height(node.getLeft()), height(node.getRight()));
     }
 
     int height(NodeBal node) {
-        return node == null ? -1 : node.balance;
+        return node.doHeight();
     }
 
     int getBalance(NodeBal node) {
-        return (node == null) ? 0 : height(node.getRight()) - height(node.getLeft());
+        
+        if (node == null) {
+            return 0;
+        }
+        
+        int auxLeft = 0, auxRight = 0; // contadores
+        
+        if(node.getLeft() != null)
+            auxLeft = node.getLeft().doHeight() + 1;
+        if(node.getRight() != null)
+            auxRight = node.getRight().doHeight() + 1;
+        return auxLeft - auxRight;
+        
+
     }
     
     public NodeBal insertElement(NodeBal current, int integer) {
         if (current == null) {
-            return new NodeBal(integer);
+            current = new NodeBal(integer);
+            return current;
         } else if (current.getValue() > integer) {
             current.setLeft(insertElement(current.getLeft(), integer));
         } else if (current.getValue() < integer) {
@@ -240,8 +363,19 @@ public class AVL extends binary.BinaryTree{
     
     
     public NodeBal rebalance(NodeBal current) {
-        updateHeight(current);
-        int balance = getBalance(current);
+        updateOnCourse(root, current.getValue());
+        int balance = current.balance;
+        NodeBal pivot = fetchPivotOf(current.getValue());
+        if (pivot != null){
+            System.out.println("Debug: " + pivot.getValue());
+        }
+        
+        
+        
+        
+        
+        
+        /*
         if (balance > 1) {
             System.out.println("Balance of " + current.getValue() + " is: " + current.balance);
             if (height(current.getRight().getRight()) > height(current.getRight().getLeft())) {
@@ -263,11 +397,12 @@ public class AVL extends binary.BinaryTree{
                 current = rotateRight(current);
             }
         }
+        */
     return current;
     
     }
     
-    public NodeBal rotateLeft(NodeBal pivot) {
+    public NodeBal rotateLeft(NodeBal y) {
         /*
         
           Y             X
@@ -277,35 +412,46 @@ public class AVL extends binary.BinaryTree{
           Z            Z
         
         */
-        System.out.println("Rotating Left");
-        NodeBal pivotRight = pivot.getRight();
-        NodeBal pivotRightLeft = pivotRight.getLeft();
-        pivotRight.setLeft(pivot);
-        pivot.setRight(pivotRightLeft);
-        updateHeight(pivot);
-        updateHeight(pivotRight);
-        return pivotRight;
+        System.out.println("[!] Rotating left. Pivot: " + y.getValue());
+        NodeBal x = y.getRight();
+        NodeBal c = x.getLeft();
+        NodeBal p = fetchParentOf(y.getValue());
+        x.setLeft(y);
+        y.setRight(c);
+        if (p != null){
+            p.setRight(x);
+        }
+        updateBalance(y);
+        updateBalance(x);
+        return x;
     }
     
     
     
-    NodeBal rotateRight(NodeBal y) {
+    public NodeBal rotateRight(NodeBal y) {
         /*
-
-          Y           X
-         /             \
-        X     --->      Y
-         \             /
-          Z           Z
+                     Z     
+                    / \                 (Y)
+                  (Y)  A                / \
+                  / \        --->      X   Z
+                 X   B                / \ / \
+                / \                  D  C B  A
+               D   C
+        */
+        /*
         
         */
-        System.out.println("Rotating Right");
-        NodeBal x = y.getLeft(); 
-        NodeBal z = x.getRight(); 
+        System.out.println("[!] Rotating right. Pivot: " + y.getValue());
+        NodeBal x = y.getLeft();
+        NodeBal c = x.getRight();
+        NodeBal p = fetchParentOf(y.getValue());
         x.setRight(y);
-        y.setLeft(z);
-        updateHeight(y);
-        updateHeight(x);
+        y.setLeft(c);
+        if (p != null){
+            p.setLeft(x);
+        }
+        updateBalance(y);
+        updateBalance(x);
         return x;
     }
 
@@ -318,6 +464,7 @@ public class AVL extends binary.BinaryTree{
             node.setRight(delete(node.getRight(), key));
         } else {
             if (node.getLeft() == null || node.getRight() == null) {
+                System.out.println("delete() DEBUG: " + (node == this.root));
                 node = (node.getLeft() == null) ? node.getRight() : node.getLeft();
             } else {
                 NodeBal mostLeftChild = mostLeftChild(node.getRight());

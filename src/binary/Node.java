@@ -13,11 +13,6 @@ public class Node implements utils.TreePrinter.PrintableNode{
         this.right = null;
     }
     
-    public Node(String name){
-        this.value = 0;
-        this.left = null;
-        this.right = null;
-    }
     
     public Node(int value){
         this.value = value;
@@ -25,11 +20,6 @@ public class Node implements utils.TreePrinter.PrintableNode{
         this.right = null;
     }
     
-    public Node(String name, int value){
-        this.value = value;
-        this.left = null;
-        this.right = null;
-    }
 
     public int getValue() {
         return value;
