@@ -1,10 +1,13 @@
 
 package avl;
 
+import java.io.IOException;
 import java.util.Scanner;
 import java.util.LinkedList;
 import java.util.Queue; //implements linkedlist
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import utils.TreePrinter;
 
 public class AVL extends binary.BinaryTree{
@@ -47,6 +50,8 @@ public class AVL extends binary.BinaryTree{
                             + "\n'2': remove a node"
                             + "\n'3': print information about the tree"
                             + "\n'4': print information about a node"
+                            + "\n'5': Force right rotation"
+                            + "\n'6': Force left rotation"
                             + "\n'9': print this help section"
                             );
                     break;
@@ -90,6 +95,24 @@ public class AVL extends binary.BinaryTree{
                     this.userinputint = readinput.nextInt();
                     this.info(this.fetch(root, userinputint));
                     break;
+                
+                case 5:
+                    System.out.print(">>> Manual Rotation [RIGHT]: ");
+                    this.userinputint = readinput.nextInt();
+                    this.rotateRight(fetch(root, userinputint));
+                    break;
+                
+                case 6:
+                    System.out.print(">>> Manual Rotation [LEFT]: ");
+                    this.userinputint = readinput.nextInt();
+                    this.rotateLeft(fetch(root, userinputint));
+                    break;
+                
+                case 7:
+                    System.out.print(">>> Manual Balancing: ");
+                    this.userinputint = readinput.nextInt();
+                    this.rebalance2(fetch(root, userinputint));
+                    break;
           
             }
             
@@ -126,7 +149,7 @@ public class AVL extends binary.BinaryTree{
         }
         
     }
-
+    
     @Override
     public NodeBal getRoot() {
         return root;
@@ -171,8 +194,8 @@ public class AVL extends binary.BinaryTree{
         NodeBal current = root;
         NodeBal pivot = null;
         while (current != null) {
-
-            if (current.balance != 0) {
+            
+            if (current.balance > 1 || current.balance < -1) {
                 pivot = current;
             }
             
@@ -321,13 +344,18 @@ public class AVL extends binary.BinaryTree{
     // AVL TREE METHODS
     // ##################################
     
-    void updateBalance(NodeBal node) {
-        node.balance = getBalance(node);
+    int updateBalance(NodeBal node) {
+        return (node.balance = getBalance(node));
         //node.balance = 1 + Math.max(height(node.getLeft()), height(node.getRight()));
     }
 
     int height(NodeBal node) {
-        return node.doHeight();
+        if (node == null){
+            return 0;
+        }
+        else{
+            return node.doHeight();
+        }
     }
 
     int getBalance(NodeBal node) {
@@ -348,6 +376,7 @@ public class AVL extends binary.BinaryTree{
     }
     
     public NodeBal insertElement(NodeBal current, int integer) {
+        
         if (current == null) {
             current = new NodeBal(integer);
             return current;
@@ -358,68 +387,193 @@ public class AVL extends binary.BinaryTree{
         } else {
             System.err.println("[Alert] Duplicated Value.");
         }
-        return rebalance(current);
+        
+        updateOnCourse(root, integer);
+        return rebalance3(current);
+        
+        //return current;
     }
     
+    public NodeBal rebalance2(NodeBal current) {
+        
+        updateBalance(current);
+        //updateOnCourse(root, current.getValue());
+        System.out.println("[i] Balancing " + current.getValue());
+        NodeBal pivot = fetchPivotOf(current.getValue());
+
+        if (pivot != null){
+            
+            System.out.println("[i] The pivot of " + current.getValue() + " is " + pivot.getValue());
+            int balance = pivot.balance;
+            
+            if (balance > 1) {
+                
+                System.out.println("[!] Balance of " + pivot.getValue() + " is: " + pivot.balance + ". Needs balancing to the Right.");
+                
+                if (height(pivot.getLeft().getLeft()) > height(pivot.getLeft().getRight())) {
+                    System.out.println("[i] Simple Right");
+                    pivot = rotateRight(pivot);
+                } else {
+                    System.out.println("[i] Double Left");
+                    pivot.setLeft(rotateLeft(pivot.getLeft()));
+                    pivot = rotateRight(pivot);
+                }    
+
+
+
+
+                //rotateRight(pivot);
+   
+            } else if (balance < -1) {
+                
+                System.out.println("[!] Balance of " + pivot.getValue() + " is: " + pivot.balance + ". Needs balancing to the left.");
+
+
+                if (height(pivot.getRight().getRight()) > height(pivot.getRight().getLeft())) {
+                    System.out.println("[i] Simple Left");
+                    pivot = rotateLeft(pivot);
+                } else {
+                    System.out.println("[i] Double Right");
+                    pivot.setRight(rotateRight(pivot.getRight()));
+                    pivot = rotateLeft(pivot);
+                }
+
+
+                //rotateLeft(pivot);   
+            }
+            
+        }
+
+        
+        
+        return current;
+    }
+    
+    public NodeBal rebalance3(NodeBal current) {
+        
+        updateBalance(current);
+        //updateOnCourse(root, current.getValue());
+        System.out.println("[i] Balancing " + current.getValue());
+        NodeBal pivot = fetchPivotOf(current.getValue());
+
+        if (pivot != null){
+            
+            System.out.println("[i] The pivot of " + current.getValue() + " is " + pivot.getValue());
+            int balance = pivot.balance;
+            
+            if (balance > 1) {
+                
+                System.out.println("[!] Balance of " + pivot.getValue() + " is: " + pivot.balance + ". Needs balancing to the Right.");
+                
+//                if (updateBalance(pivot.getRight()) < 0 ) {
+//                    System.out.println("[i] Double Left");
+//                    pivot.setLeft(rotateLeft(pivot.getLeft()));
+//                    pivot = rotateRight(pivot);
+//                } else {
+//                    System.out.println("[i] Simple Right");
+//                    pivot = rotateRight(pivot);
+//                }    
+
+                rotateRight(pivot);
+   
+            } else if (balance < -1) {
+                
+                System.out.println("[!] Balance of " + pivot.getValue() + " is: " + pivot.balance + ". Needs balancing to the left.");
+
+
+//                if (updateBalance(pivot.getRight()) > 0) {
+//                    System.out.println("[i] Double Right");
+//                    pivot.setRight(rotateRight(pivot.getRight()));
+//                    pivot = rotateLeft(pivot);
+//                } else {
+//                    System.out.println("[i] Simple Left");
+//                    pivot = rotateLeft(pivot);
+//                }
+
+
+                rotateLeft(pivot);   
+            }
+            
+        }
+
+        
+        
+        return current;
+    }
     
     public NodeBal rebalance(NodeBal current) {
+        
+        //NodeBal pivot = fetchPivotOf(current.getValue());
+       
         updateOnCourse(root, current.getValue());
-        int balance = current.balance;
-        NodeBal pivot = fetchPivotOf(current.getValue());
-        if (pivot != null){
-            System.out.println("Debug: " + pivot.getValue());
-        }
-        
-        
-        
-        
         
         
         /*
-        if (balance > 1) {
-            System.out.println("Balance of " + current.getValue() + " is: " + current.balance);
-            if (height(current.getRight().getRight()) > height(current.getRight().getLeft())) {
-                System.out.println("Simple Left");
-                current = rotateLeft(current);
-            } else {
-                System.out.println("Double Right");
-                current.setRight(rotateRight(current.getRight()));
-                current = rotateLeft(current);
+        if (pivot != null){
+            
+            int balance = pivot.balance;
+            
+            if (balance > 1) {
+                System.out.println("[!] Balance of " + pivot.getValue() + " is: " + pivot.balance + ". Needs balancing to the Right.");
+                update();
+                try {
+                    System.out.println("Press ENTER to continue with rotation.");
+                    System.in.read();
+                } catch (IOException ex) {
+                    Logger.getLogger(AVL.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                rotateRight(pivot);
+   
+            } else if (balance < -1) {
+                System.out.println("[!] Balance of " + pivot.getValue() + " is: " + pivot.balance + ". Needs balancing to the left.");
+                update();
+                
+                try {
+                    System.out.println("Press ENTER to continue with rotation.");
+                    System.in.read();
+                } catch (IOException ex) {
+                    Logger.getLogger(AVL.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+                rotateLeft(pivot);   
             }
-        } else if (balance < -1) {
-            System.out.println("Balance of " + current.getValue() + " is: " + current.balance);
-            if (height(current.getLeft().getLeft()) > height(current.getLeft().getRight())) {
-                System.out.println("Simple Right");
-                current = rotateRight(current);
-            } else {
-                System.out.println("Double Left");
-                current.setLeft(rotateLeft(current.getLeft()));
-                current = rotateRight(current);
-            }
+            
         }
         */
-    return current;
-    
+        return current;
+        
+                
+        
+                  
+        
+        
     }
     
     public NodeBal rotateLeft(NodeBal y) {
         /*
         
-          Y             X
-           \          /
-            X  --->  Y
-           /          \
-          Z            Z
+            P              P
+           /              /
+          Y              X
+           \            / 
+            X  --->    Y
+           /            \
+          C              C
         
         */
         System.out.println("[!] Rotating left. Pivot: " + y.getValue());
         NodeBal x = y.getRight();
+        System.out.println("[...] Right of the pivot: " + x.getValue());
         NodeBal c = x.getLeft();
         NodeBal p = fetchParentOf(y.getValue());
+        if (y == this.root){
+            this.root = x;
+        }
         x.setLeft(y);
         y.setRight(c);
         if (p != null){
-            p.setRight(x);
+            System.out.println("[....] The pivot has a parent " + p.getValue() + ". Setting " + x.getValue() + " to its right.");
+            p.setLeft(x);
         }
         updateBalance(y);
         updateBalance(x);
@@ -430,25 +584,37 @@ public class AVL extends binary.BinaryTree{
     
     public NodeBal rotateRight(NodeBal y) {
         /*
-                     Z     
-                    / \                 (Y)
-                  (Y)  A                / \
-                  / \        --->      X   Z
-                 X   B                / \ / \
-                / \                  D  C B  A
-               D   C
-        */
-        /*
+        
+             [P]            [P]
+            \or/           \or/
+             Y              X
+            /                \ 
+           X     --->        Y
+            \               /
+             C             C  
         
         */
         System.out.println("[!] Rotating right. Pivot: " + y.getValue());
         NodeBal x = y.getLeft();
+        System.out.println("[...] Left of the pivot: " + x.getValue());
         NodeBal c = x.getRight();
         NodeBal p = fetchParentOf(y.getValue());
+        System.out.println(y.getValue() + " is now the right of " + x.getValue());
+        if (y == this.root){
+            this.root = x;
+        }
         x.setRight(y);
         y.setLeft(c);
         if (p != null){
-            p.setLeft(x);
+            System.out.print("[....] The pivot has a parent " + p.getValue() + ". Setting " + x.getValue() + " to its ");
+            if (p.getRight() == y){
+                System.out.println("right.");
+                p.setRight(x);
+            }
+            else{
+                System.out.println("left.");
+                p.setLeft(x);
+            }
         }
         updateBalance(y);
         updateBalance(x);
@@ -464,8 +630,9 @@ public class AVL extends binary.BinaryTree{
             node.setRight(delete(node.getRight(), key));
         } else {
             if (node.getLeft() == null || node.getRight() == null) {
-                System.out.println("delete() DEBUG: " + (node == this.root));
+                  
                 node = (node.getLeft() == null) ? node.getRight() : node.getLeft();
+
             } else {
                 NodeBal mostLeftChild = mostLeftChild(node.getRight());
                 node.setValue(mostLeftChild.getValue());
