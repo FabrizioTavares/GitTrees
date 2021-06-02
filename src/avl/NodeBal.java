@@ -21,14 +21,7 @@ public class NodeBal extends binary.Node{
         this.left = null;
         this.right = null;
     }
-    
-    public void copyToSelf(NodeBal source){
-        this.value = source.getValue();
-        this.balance = source.balance;
-        this.left = source.getLeft();
-        this.right = source.getRight();
-    }
-    
+     
     @Override
     public int getValue() {
         return value;

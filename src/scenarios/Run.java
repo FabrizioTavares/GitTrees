@@ -39,52 +39,9 @@ public class Run {
                 break;
             case 2:
                 AVL avltree = new AVL();
-                
-                // rotate right test (OK)
-//                avltree.createRoot(60);
-//                avltree.insertElement(avltree.getRoot(), 40);
-//                avltree.insertElement(avltree.getRoot(), 80);
-//                avltree.insertElement(avltree.getRoot(), 20);
-//                avltree.insertElement(avltree.getRoot(), 50);
-//                avltree.insertElement(avltree.getRoot(), 90);
-//                avltree.insertElement(avltree.getRoot(), 10);
-//                avltree.insertElement(avltree.getRoot(), 30);
-//                avltree.update();
-//                avltree.insertElement(avltree.getRoot(), 5);
-//                
-//                avltree.rotateRight(avltree.fetch(avltree.getRoot(), 40));
-//                
-//                avltree.update();
-                
-                /* rotate left test (OK)
-                avltree.createRoot(60);
-                avltree.insertElement(avltree.getRoot(), 50);
-                avltree.insertElement(avltree.getRoot(), 70);
-                avltree.insertElement(avltree.getRoot(), 40);
-                avltree.insertElement(avltree.getRoot(), 65);
-                avltree.insertElement(avltree.getRoot(), 80);
-                avltree.insertElement(avltree.getRoot(), 75);
-                avltree.insertElement(avltree.getRoot(), 90);
-                avltree.insertElement(avltree.getRoot(), 95);
-                */ 
-                
-                avltree.createRoot(60);
-                avltree.insertElement(avltree.getRoot(), 20);
-                avltree.insertElement(avltree.getRoot(), 80);
-                avltree.insertElement(avltree.getRoot(), 10);
-                avltree.insertElement(avltree.getRoot(), 40);
-                avltree.insertElement(avltree.getRoot(), 90);
-                avltree.insertElement(avltree.getRoot(), 5);
-                avltree.insertElement(avltree.getRoot(), 30);
-                avltree.insertElement(avltree.getRoot(), 50);
-                avltree.update();
-                System.out.println("INSERT 25");
-                //avltree.insertElement(avltree.getRoot(), 25);
-                //avltree.rotateLeft(avltree.fetch(avltree.getRoot(), 20));
-                //avltree.rotateRight(avltree.fetch(avltree.getRoot(), 60));
-                //avltree.update();
-                //avltree.rotateRight(avltree.fetch(avltree.getRoot(), 60));
-                avltree.update();
+                avltree.createRoot(5);
+                avltree.insertElement(avltree.getRoot(), 7);
+                avltree.insertElement(avltree.getRoot(), 6);
                 avltree.doMenu();
                 break;
         }
