@@ -3,6 +3,7 @@ package scenarios;
 
 import avl.*;
 import binary.*;
+import rb.*;
 import java.util.Scanner;
 
 public class Run {
@@ -13,7 +14,7 @@ public class Run {
         
         Scanner scan = new Scanner(System.in);
         int choice;
-        System.out.println("Insert tree type: (1) BST, (2) AVL. ");
+        System.out.println("Insert tree type: (1) BST, (2) AVL, (3) Red Black. ");
         choice = scan.nextInt();
         
         switch(choice){
@@ -44,6 +45,15 @@ public class Run {
                 avltree.insertElement(avltree.getRoot(), 6);
                 avltree.doMenu();
                 break;
+            
+            case 3:
+                RedBlack rb = new RedBlack();
+                rb.insertElement(rb.root, 50);
+                rb.insertElement(rb.root, 40);
+                rb.insertElement(rb.root, 70);
+                rb.insertElement(rb.root, 80);
+                //rb.recolor(rb.fetch(rb.root, 80));
+                rb.doMenu();
         }
         
         
