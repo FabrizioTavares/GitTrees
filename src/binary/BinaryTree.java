@@ -256,7 +256,6 @@ public class BinaryTree<T> {
             // caso 1: nó é uma folha (não tem filhos)
             if (current.getLeft() == null && current.getRight() == null) {
                 // remove-o (seta a "raiz" deste nó para null)
-                System.out.println("DEBUG: " + (current.equals(root)));
                 current = null;
                 return null;
             } else if (current.getLeft() != null && current.getRight() != null) {

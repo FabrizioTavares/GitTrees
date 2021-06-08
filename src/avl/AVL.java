@@ -467,6 +467,7 @@ public class AVL extends binary.BinaryTree{
         System.out.println("[...] Right of the pivot: " + x.getValue());
         NodeBal c = x.getLeft();
         NodeBal p = fetchParentOf(y.getValue());
+        System.out.println(y.getValue() + " is now the left of " + x.getValue());
         if (y == this.root){
             this.root = x;
         }

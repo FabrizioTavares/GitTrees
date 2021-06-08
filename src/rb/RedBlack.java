@@ -19,13 +19,6 @@ public class RedBlack {
             
             this.update(); // every loop, print diagram of the tree
             
-            System.out.print("Root: ");
-            try {
-                System.out.println(this.root.value);
-            } catch (Exception e) {
-                System.out.println("null");
-            }
-            
             System.out.print("Option: ");
             this.userinput = readinput.nextInt(); // input. Await user.
             
@@ -157,68 +150,71 @@ public class RedBlack {
         }
 
         NodeRB parent = null, uncle = null, grandparent = null;
-        parent = fetchParentOf(node);
+        parent = fetchParentOf(node); // attempt to fetch the parent. if null, nothing happens.
         
-        if (parent != null) // must have a parent to have a grandparent
-            grandparent = fetchParentOf(parent);
-        
-        if (grandparent != null){
+        if (parent != null){ // must have a parent to have a grandparent. A parent is needed for rebalancing.
             
-            uncle = (grandparent.left == parent) ? grandparent.right : grandparent.left;
+            grandparent = fetchParentOf(parent); // attempt to fetch the grandparent. if null, nothing happens.
             
-            if (uncle == null){ // Phantom, used for reference. assumes the role of a black null leaf.
-                uncle = new NodeRB(0);
-                uncle.color = 'b';
-            }
+            if (grandparent != null && parent.color != 'b'){ // grandparent is also required for rebalancing.
+                
+                //attempt to find an uncle. can return null. in this case, see the first 'if' statement.
+                uncle = (grandparent.left == parent) ? grandparent.right : grandparent.left;
 
-            if (uncle.color == 'r'){ // case 0
-                System.out.println("[i] Case 0: Recolor.");
-                recolor(parent);
-                recolor(uncle);
-                recolor(grandparent);
-                return;
-            }
+                if (uncle == null){ // Phantom, used for reference. assumes the role of a black null leaf.
+                    //System.out.println("[i] Uncle is NULL. Assuming as black null leaf.");
+                    uncle = new NodeRB(0);
+                    uncle.color = 'b';
+                }
 
-            if (uncle.color == 'b'){
-                
-                //case 1: simple right
-                if (parent.left == node && grandparent.left == parent){
-                    System.out.println("[i] Case 2: Simple Right (RR) Rotation.");
-                    rotateRight(grandparent);
+                if (uncle.color == 'r'){ // case 0
+                    System.out.println("[i] Case 0: Recolor.");
                     recolor(parent);
+                    recolor(uncle);
                     recolor(grandparent);
+                    return;
                 }
-                
-                //case 2: simple left
-                else if (parent.right == node && grandparent.right == parent){
-                    System.out.println("[i] Case 2: Simple left (LL) Rotation.");
-                    rotateLeft(grandparent);
-                    recolor(parent);
-                    recolor(grandparent);
+
+                if (uncle.color == 'b'){
+
+                    //case 1: simple right
+                    if (parent.left == node && grandparent.left == parent){
+                        System.out.println("[i]: Simple Right (RR) Rotation...");
+                        rotateRight(grandparent);
+                        recolor(parent);
+                        recolor(grandparent);
+                    }
+
+                    //case 2: simple left
+                    else if (parent.right == node && grandparent.right == parent){
+                        System.out.println("[i]: Simple left (LL) Rotation...");
+                        rotateLeft(grandparent);
+                        recolor(parent);
+                        recolor(grandparent);
+                    }
+
+                    //case 3: double left
+                    else if (parent.left == node && grandparent.right == parent){
+                        System.out.println("[i]: Double Left (RL) Rotation...");
+                        rotateRight(parent);
+                        rotateLeft(grandparent);
+                        recolor(node);
+                        recolor(grandparent);
+                    }
+
+                    //case 4: double right
+                    else if (parent.right == node && grandparent.left == parent){
+                        System.out.println("[i]: Double Right (LR) Rotation...");
+                        rotateLeft(parent);
+                        rotateRight(grandparent);
+                        recolor(node);
+                        recolor(grandparent);
+                    }
+
                 }
-                
-                //case 3: double right
-                else if (parent.left == node && grandparent.right == parent){
-                    System.out.println("[i] Case 3: Double Right (LR) Rotation.");
-                    rotateLeft(parent);
-                    rotateRight(node);
-                    recolor(node);
-                    recolor(grandparent);
-                }
-                
-                //case 4: double left
-                else if (parent.right == node && grandparent.left == parent){
-                    System.out.println("[i] Case 4: Double left (RL) Rotation.");
-                    rotateRight(parent);
-                    rotateLeft(node);
-                    recolor(node);
-                    recolor(grandparent);
-                }
-                
+
             }
-            
-        }
-                
+        }        
     }
     
     // -----------------
@@ -334,9 +330,7 @@ public class RedBlack {
     // -----------------
     
     public void insertElement(NodeRB current, int integer){
-        
-        NodeRB newNode;
-        
+
         if (this.root == null){
             this.root = new NodeRB(integer);
             root.color = 'b';
@@ -349,7 +343,7 @@ public class RedBlack {
 
     }
     
-    private NodeRB insertElementBinary(NodeRB current, int integer) {
+    public NodeRB insertElementBinary(NodeRB current, int integer) {
         
         if (current == null) {
             current = new NodeRB(integer);
@@ -370,8 +364,7 @@ public class RedBlack {
     // Removal Methods
     // ---------------
     
-    
-    NodeRB delete(NodeRB node, int key) {
+    public NodeRB delete(NodeRB node, int key) {
         if (node == null) {
             return node;
         } else if (node.value > key) {
@@ -379,13 +372,13 @@ public class RedBlack {
         } else if (node.value < key) {
             node.right = delete(node.right, key);
         } else { // value has been found
-            if (node.left == null || node.right == null) { // case: has one child
+            if (node.left == null || node.right == null) { // case: has one child or two childs
                 node = (node.left == null) ? node.right : node.left; // fetch and set this node as existing child
 
             } else { // has two children
-                NodeRB mostLeftChild = mostLeftChild(node.right);
-                node.value = mostLeftChild.value;
-                node.right = delete(node.right, node.value);
+                NodeRB biggestAntecessor = biggestValue(node.left); // search left subtree
+                node.value = biggestAntecessor.value;
+                node.left = delete(node.left, biggestAntecessor.value);
             }
         }
         if (node != null) {
@@ -394,11 +387,9 @@ public class RedBlack {
     return node;
     }
     
-    private NodeRB mostLeftChild(NodeRB node) {
-        NodeRB current = node;
-        /* loop down to find the leftmost leaf */
-        while (current.getLeft() != null) {
-            current = current.left;
+    private NodeRB biggestValue(NodeRB current) { //pegar o maior valor (o mais a direita). ajuda na remoção do terceiro caso
+        while (current.right != null) {
+            current = current.right;
         }
         return current;
     }
@@ -447,24 +438,25 @@ public class RedBlack {
           C              C
         
         */
-        System.out.println("[!] Rotating left. Pivot: " + y.value);
+        //System.out.println("[!] Rotating left. Pivot: " + y.value);
         NodeRB x = y.right;
-        System.out.println("[...] Right of the pivot: " + x.value);
+        //System.out.println("[...] Right of the pivot: " + x.value);
         NodeRB c = x.left;
         NodeRB p = fetchParentOf(y.value);
+        //System.out.println(y.value + " is now the left of " + x.value);
         if (y == this.root){
             this.root = x;
         }
         x.left = y;
         y.right= c;
         if (p != null){
-            System.out.println("[....] The pivot has a parent " + p.value + ". Setting " + x.value + " to its right.");
+            //System.out.println("[....] The pivot has a parent " + p.value + ". Setting " + x.value + " to its right.");
             if (p.getRight() == y){
-                System.out.println("right.");
+                //System.out.println("right.");
                 p.right = x;
             }
             else{
-                System.out.println("left.");
+                //System.out.println("left.");
                 p.left = x;
             }
         }
@@ -486,25 +478,25 @@ public class RedBlack {
              C             C  
         
         */
-        System.out.println("[!] Rotating right. Pivot: " + y.value);
+        //System.out.println("[!] Rotating right. Pivot: " + y.value);
         NodeRB x = y.left;
-        System.out.println("[...] Left of the pivot: " + x.value);
+        //System.out.println("[...] Left of the pivot: " + x.value);
         NodeRB c = x.right;
         NodeRB p = fetchParentOf(y.value);
-        System.out.println(y.value + " is now the right of " + x.value);
+        //System.out.println(y.value + " is now the right of " + x.value);
         if (y == this.root){
             this.root = x;
         }
         x.right = y;
         y.left = c;
         if (p != null){
-            System.out.print("[....] The pivot has a parent " + p.value + ". Setting " + x.value + " to its ");
+            //System.out.print("[....] The pivot has a parent " + p.value + ". Setting " + x.value + " to its ");
             if (p.getRight() == y){
-                System.out.println("right.");
+                //System.out.println("right.");
                 p.right = (x);
             }
             else{
-                System.out.println("left.");
+                //System.out.println("left.");
                 p.left = (x);
             }
         }
