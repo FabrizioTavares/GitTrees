@@ -7,8 +7,8 @@ import rb.*;
 import java.util.Scanner;
 
 public class Run {
+
     
-   
     
     public static void main(String[] args) {
         
@@ -48,59 +48,14 @@ public class Run {
             
             case 3:
                 RedBlack rb = new RedBlack();
-                System.out.println("Testando inserção e rotações.");
-                System.out.println("Inserir: 5, 6, 7:");
-                rb.insertElement(rb.root, 5);
-                rb.insertElementBinary(rb.root, 6);
-                rb.insertElementBinary(rb.root, 7);
+                rb.insertElement(rb.root, 46);
+                rb.insertElement(rb.root, 85);
+                rb.insertElement(rb.root, 92);
+                rb.insertElement(rb.root, 15);
+                rb.insertElement(rb.root, 96);
+                rb.insertElement(rb.root, 72);
+                rb.insertElement(rb.root, 18);
                 rb.update();
-                System.out.println("Inserir 5, 4, 3:");
-                rb.root = null;
-                rb.insertElement(rb.root, 5);
-                rb.insertElementBinary(rb.root, 4);
-                rb.insertElementBinary(rb.root, 3);
-                rb.update();
-                System.out.println("Inserir 20, 10, 15:");
-                rb.root = null;
-                rb.insertElement(rb.root, 20);
-                rb.insertElementBinary(rb.root, 10);
-                rb.insertElementBinary(rb.root, 15);
-                rb.update();
-                System.out.println("Inserir 40, 70, 60:");
-                rb.root = null;
-                rb.insertElement(rb.root, 40);
-                rb.insertElementBinary(rb.root, 70);
-                rb.insertElementBinary(rb.root, 60);
-                rb.update();
-                System.out.println("Testando Consultas:");
-                rb.root = null;
-                rb.insertElement(rb.root, 40);
-                rb.insertElement(rb.root, 30);
-                rb.insertElement(rb.root, 50);
-                rb.insertElement(rb.root, 60);
-                rb.insertElement(rb.root, 10);
-                rb.insertElement(rb.root, 25);
-                rb.update();
-                System.out.println("Pre Order NLR:");
-                rb.traversePreOrder(rb.root);
-                System.out.println("\nPost Order LRN:");
-                rb.traversePostOrder(rb.root);
-                System.out.println("\nIn Order LNR:");
-                rb.traverseInOrder(rb.root);
-                System.out.println("\nConsultar nó (10):");
-                rb.info(rb.fetch(rb.root, 10));
-                System.out.println("Testando Remoção:");
-                rb.update();
-                System.out.println("Remover 60:");
-                rb.delete(rb.root, 60);
-                rb.update();
-                System.out.println("Remover 25:");
-                rb.delete(rb.root, 25);
-                rb.update();
-                System.out.println("Remover 10:");
-                rb.delete(rb.root, 10);
-                rb.update();
-                //rb.recolor(rb.fetch(rb.root, 80));
                 rb.doMenu();
         }
         

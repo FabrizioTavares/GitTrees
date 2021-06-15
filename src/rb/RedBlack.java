@@ -1,7 +1,7 @@
 
 package rb;
 
-// this time around, using public encapsulation
+// this time around, using public encapsulation.
 
 import java.util.Scanner;
 import utils.TreePrinter;
@@ -54,7 +54,7 @@ public class RedBlack {
                 case 2: //remover certo valor
                     System.out.print(">>> Value to be removed: ");
                     this.userinput2 = readinput.nextInt();
-                    this.delete(root, userinput2);
+                    this.remove(root, userinput2);
                     break;
                              
                 case 3: // imprimir informações da árvore
@@ -126,10 +126,6 @@ public class RedBlack {
             } catch (Exception e) {
                 System.out.println("null");
             }
-            //System.out.println("Grau: " + target.grau() + ", Endpoint?: " + target.StringEndpoint());
-            //System.out.println("Profundidade: " + target.doLevel(root));
-            //System.out.println("Nível: " + target.doLevel(root));
-            //System.out.println("Altura: " + (target.doHeight()));
         } else {
             System.out.println("[info()]: Node does not exists.");
         }
@@ -156,7 +152,7 @@ public class RedBlack {
             
             grandparent = fetchParentOf(parent); // attempt to fetch the grandparent. if null, nothing happens.
             
-            if (grandparent != null && parent.color != 'b'){ // grandparent is also required for rebalancing.
+            if (grandparent != null && parent.color == 'r'){ // grandparent is also required for rebalancing.
                 
                 //attempt to find an uncle. can return null. in this case, see the first 'if' statement.
                 uncle = (grandparent.left == parent) ? grandparent.right : grandparent.left;
@@ -214,7 +210,45 @@ public class RedBlack {
                 }
 
             }
-        }        
+        }
+        
+    }
+    
+    private void ruleCheck(NodeRB target){
+        
+        if (root != null && target != null){
+            
+            root.color = 'b'; // Guarantee second property
+            
+            NodeRB current = root;
+            while(true){
+                
+                if (current.color == 'r'){ // guarantee 4th property
+                    if (current.left != null){
+                        current.left.color = 'b';
+                    }
+                    if (current.right != null){
+                        current.right.color = 'b';
+                    }
+                }
+            
+                if (current.value > target.value){ //left
+                    current = current.left;
+                }
+
+                else if (current.value < target.value){ // right
+                    current = current.right;
+                }
+                
+                else { // value reached
+                    break;
+                }
+                
+            }
+            
+            
+        }
+        
     }
     
     // -----------------
@@ -240,7 +274,7 @@ public class RedBlack {
     
     private NodeRB fetch(NodeRB current, NodeRB target){
         
-        if (current != null && target != null) { // "&& target != null" is a failsafe. probably not needed.
+        if (current != null) {
             if (current == target) {
                 return current;
             } else if (current.value > target.value) { //left
@@ -339,11 +373,12 @@ public class RedBlack {
         else{
             insertElementBinary(this.root, integer);
             rebalance(fetch(this.root, integer));
+            ruleCheck(current);
         }
 
     }
     
-    public NodeRB insertElementBinary(NodeRB current, int integer) {
+    private NodeRB insertElementBinary(NodeRB current, int integer) {
         
         if (current == null) {
             current = new NodeRB(integer);
@@ -364,27 +399,42 @@ public class RedBlack {
     // Removal Methods
     // ---------------
     
-    public NodeRB delete(NodeRB node, int key) {
-        if (node == null) {
-            return node;
-        } else if (node.value > key) {
-            node.left = delete(node.left, key);
-        } else if (node.value < key) {
-            node.right = delete(node.right, key);
-        } else { // value has been found
-            if (node.left == null || node.right == null) { // case: has one child or two childs
-                node = (node.left == null) ? node.right : node.left; // fetch and set this node as existing child
+    public NodeRB remove(NodeRB current, int value) {
+        
+        if (current == null) {
+            return current;
+        }
 
-            } else { // has two children
-                NodeRB biggestAntecessor = biggestValue(node.left); // search left subtree
-                node.value = biggestAntecessor.value;
-                node.left = delete(node.left, biggestAntecessor.value);
+        if (value < current.value) { // valor menor, procurar na sub-árvore esquerda
+            current.left = remove(current.left, value);
+        } else if (value > current.value) { // valor maior, procurar na sub-árvore direita
+            current.right = remove(current.right, value);
+        } else { // valor encontrado
+            // caso 1: nó é uma folha (não tem filhos)
+            if (current.left == null && current.right == null) {
+                // remove-o (seta a "raiz" deste nó para null)
+                current = null;
+                return null;
+            } else if (current.left != null && current.right != null) {
+                // caso 3: nó tem 2 filhos
+                // buscar na subarvore esquerda o maior valor
+                NodeRB maiorAntecessor = biggestValue(current.left);
+
+                current.value = (maiorAntecessor.value);
+                
+                // remove o antecessor recursivamente
+                current.left = remove(current.left, maiorAntecessor.value);
+                rebalance(current);
+            } else {
+                // caso 2: nó só tem um filho
+                // utiliza operador ternário. condição verdadeira, parte '?' é executada. caso contrário, parte ':'. similar ao if/else.
+                NodeRB child = (current.left != null) ? current.left : current.right;
+                current = child;
+                rebalance(current);
             }
         }
-        if (node != null) {
-            //node = rebalance(node);
-        }
-    return node;
+        ruleCheck(current);
+        return current;
     }
     
     private NodeRB biggestValue(NodeRB current) { //pegar o maior valor (o mais a direita). ajuda na remoção do terceiro caso
@@ -460,9 +510,6 @@ public class RedBlack {
                 p.left = x;
             }
         }
-        //updateBalance(y);
-        //updateBalance(x);
-        //updateOnCourse(root, y.value);
         return x;
     }
     
@@ -500,9 +547,6 @@ public class RedBlack {
                 p.left = (x);
             }
         }
-        //updateBalance(y);
-        //updateBalance(x);
-        //updateOnCourse(root, y.getValue());
         return x;
     }
     

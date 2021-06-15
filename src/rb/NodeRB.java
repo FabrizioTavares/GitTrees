@@ -2,6 +2,7 @@
 package rb;
 
 // this time around, using public encapsulation
+// nodes are single/simple linked
 
 import utils.TreePrinter;
 
@@ -13,6 +14,10 @@ public class NodeRB implements utils.TreePrinter.PrintableNode {
     public NodeRB left;
     public NodeRB right;
 
+    public static final String B = "\u001B[47m";
+    public static final String R = "\u001B[41m";
+    public static final String X = "\u001B[0m";
+    
     public NodeRB(int value) {
         this.value = value;
         this.color = 'r';
@@ -33,6 +38,7 @@ public class NodeRB implements utils.TreePrinter.PrintableNode {
     @Override
     public String getText() {
         return String.valueOf(value+":"+color);
+        //return ((this.color == 'r') ? (R+String.valueOf(value)+X) : (B+String.valueOf(value)+X) );
     }
     
 }
